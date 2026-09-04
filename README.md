@@ -77,7 +77,7 @@ Pastikan komputer Anda sudah terinstall:
 
 ```bash
 # Jika menggunakan Git:
-git clone https://github.com/username/kelompok1.git
+git clone https://github.com/japar3371-lang/kelompok1.git
 cd kelompok1
 
 # Atau langsung masuk ke folder project:
