@@ -16,9 +16,11 @@ Sistem kasir interaktif berbasis terminal yang dibangun menggunakan **TypeScript
   - [Kasir (Transaksi Penjualan)](#1-kasir-transaksi-penjualan)
   - [Kelola Produk](#2-kelola-produk)
   - [Statistik & Laporan Transaksi](#3-statistik--laporan-transaksi)
+  - [Pengaturan Toko](#4-pengaturan-toko)
 - [Daftar Menu Default](#-daftar-menu-default)
 - [Aturan Diskon & Pajak](#-aturan-diskon--pajak)
 - [Metode Pembayaran](#-metode-pembayaran)
+- [Konfigurasi QRIS / DANA](#-konfigurasi-qris--dana)
 - [Struktur File](#-struktur-file)
 - [Konsep Pemrograman yang Dipraktikkan (Bab 0–3)](#-konsep-pemrograman-yang-dipraktikkan-bab-0-3)
 
@@ -34,9 +36,12 @@ Sistem kasir interaktif berbasis terminal yang dibangun menggunakan **TypeScript
 | **Pajak (PPN 10%)** | Pajak otomatis untuk non-member; **member bebas pajak** |
 | **Poin Member** | Member mendapat 1 poin setiap belanja Rp10.000 |
 | **Multi Pembayaran** | Bisa bayar dengan campuran Tunai, QRIS, atau Kartu Debit |
+| **QRIS DANA** | Pembayaran QRIS khusus DANA dengan QR code image & nomor telepon |
 | **Cetak Struk** | Struk belanja lengkap dengan rincian pembayaran |
 | **Kelola Produk** | Tambah produk baru, ubah harga, dan ubah stok |
 | **Statistik Penjualan** | Laporan total pendapatan, produk terlaris, penjualan per produk |
+| **Grafik Penjualan (ASCII)** | Visualisasi grafik penjualan per produk, per transaksi, dan tren moving average |
+| **Pengaturan Toko** | Ubah nama toko, konfigurasi QRIS/DANA, dan metode pembayaran (password protected) |
 | **Manajemen Stok** | Status stok otomatis: `HABIS` dan `HAMPIR HABIS` |
 
 ---
@@ -133,7 +138,7 @@ Setelah menjalankan aplikasi, Anda akan diminta memasukkan **nama kasir**, lalu 
 ```
 ==================================================
         🍽️  SISTEM KASIR KANTIN SEKOLAH
-      (SMKS ANTARTIKA 1 SDA)
+      (KANTIN SMKS ANTARTIKA 1 SDA)
 ==================================================
 
 Nama Kasir : Budi
@@ -143,6 +148,7 @@ Selamat datang, Budi!
   1. Kasir (Transaksi Penjualan)
   2. Kelola Produk (Tambah / Ubah Harga & Stok)
   3. Statistik & Laporan Transaksi
+  4. Pengaturan Toko
   0. Keluar Program
 Pilih menu :
 ```
@@ -151,7 +157,8 @@ Pilih menu :
 |---|---|
 | `1` | Masuk ke mode kasir (transaksi penjualan) |
 | `2` | Kelola data produk (tambah, ubah harga, ubah stok) |
-| `3` | Lihat statistik dan laporan transaksi |
+| `3` | Lihat statistik dan laporan transaksi (termasuk grafik ASCII) |
+| `4` | Pengaturan toko: nama toko, QRIS/DANA, metode pembayaran (password) |
 | `0` | Keluar dari program |
 
 ---
@@ -251,7 +258,61 @@ Es Teh Manis             10 pcs = Rp50.000
 
 --- STATUS STOK TERAKHIR ---
 ...
+
+==================================================
+        📊 GRAFIK PENJUALAN (ASCII)
+==================================================
+
+--- GRAFIK PENJUALAN PER PRODUK (Jumlah Terjual) ---
+Nasi Goreng Spesial    |████████████████████████████  10 pcs
+Es Teh Manis           |████████████████████████████████████  15 pcs
+...
+
+--- GRAFIK PENDAPATAN PER TRANSAKSI ---
+#1  [M] |▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Rp50.000
+#2  [R] |▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ Rp75.000
+...
+
+--- TREN PENJUALAN (Moving Average 3 Transaksi) ---
+T1  |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ Avg: Rp50.000
+T2  |░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ Avg: Rp62.500
+...
+
+==================================================
+Legenda: █ = Produk, ▓ = Transaksi, ░ = Moving Avg
+==================================================
 ```
+
+---
+
+### 4. Pengaturan Toko
+
+Dari menu utama, pilih `4` untuk masuk ke pengaturan toko (memerlukan password admin):
+
+```
+========== PENGATURAN TOKO ==========
+  1. Ubah Nama Toko (Saat ini: KANTIN SMKS ANTARTIKA 1 SDA)
+  2. Pengaturan QRIS / DANA
+  3. Pengaturan Transfer / Rekening
+  4. Pengaturan Metode Pembayaran
+  5. Ubah Password Admin
+  6. Kembali ke Menu Utama
+Pilih aksi :
+```
+
+**Password Admin Default:** `admin123` (bisa diubah via menu 5)
+
+**Fitur pengaturan (semua perubahan tersimpan permanen ke `settings.json`):**
+- **Ubah Nama Toko**: Mengubah nama toko yang ditampilkan di header dan struk
+- **Pengaturan QRIS / DANA**: Konfigurasi provider, nomor, URL QR code image, nama merchant
+- **Pengaturan Transfer / Rekening**: 
+  - Tambah rekening bank/e-wallet baru (BRI, BCA, Mandiri, DANA, ShopeePay, dll)
+  - Edit nama, nomor, status aktif/nonaktif
+  - Hapus rekening
+- **Pengaturan Metode Pembayaran**: Enable/disable metode (Tunai, QRIS, Debit, Transfer Bank) dan ubah biaya admin
+- **Ubah Password Admin**: Ganti password akses menu pengaturan toko
+
+> ✅ **Semua perubahan disimpan permanen ke file `settings.json`** — tidak perlu edit `config.ts` atau `config.js`. File `settings.json` dibuat otomatis saat pertama kali jalan.
 
 ---
 
@@ -297,13 +358,89 @@ Es Teh Manis             10 pcs = Rp50.000
 
 ## 💳 Metode Pembayaran
 
-| Metode | Biaya Admin |
-|---|---|
-| **Tunai** | Gratis (Rp0) |
-| **QRIS** | +Rp1.000 |
-| **Kartu Debit** | +Rp1.500 |
+| Metode | Biaya Admin Default | Status Default |
+|---|---|---|
+| **Tunai** | Gratis (Rp0) | ✅ Aktif |
+| **QRIS (DANA)** | +Rp1.000 | ✅ Aktif |
+| **Kartu Debit** | +Rp1.500 | ✅ Aktif |
+| **Transfer Bank** | +Rp2.500 | ❌ Nonaktif |
 
 > 💡 **Tips:** Anda bisa membayar dengan metode campuran (misal: sebagian tunai, sisanya QRIS). Program akan meminta pembayaran berulang sampai tagihan lunas.
+> 
+> ⚙️ **Konfigurasi**: Semua metode pembayaran (nama, biaya, status aktif/nonaktif) dapat diubah via menu **Pengaturan Toko > Pengaturan Metode Pembayaran** — tersimpan permanen ke `settings.json`.
+
+---
+
+## 🔧 Konfigurasi QRIS / DANA
+
+Sistem QRIS dikonfigurasi khusus untuk **DANA** dengan detail berikut:
+
+| Parameter | Nilai Default | Deskripsi |
+|---|---|---|
+| **Provider** | `DANA` | Penyedia layanan e-wallet |
+| **Nomor DANA** | `08814952272` | Nomor telepon terdaftar DANA merchant |
+| **QR Image URL** | (https://media.discordapp.net/attachments/1496781830131552258/1546380648942665758/qr_ID1026528826815_07.09.26_1788756258_1788756258909.jpg?ex=6a9f92b5&is=6a9e4135&hm=0e847c223daf95c9c294700cd8dcbaa8955e1b357a79209d6539dc5dfafd16a5&=&format=webp&width=454&height=640) | URL gambar QR code untuk scan |
+| **Merchant Name** | `KANTIN SMKS ANTARTIKA 1 SDA` | Nama merchant yang tampil di aplikasi DANA |
+
+**Saat pembayaran QRIS dipilih**, program akan menampilkan:
+```
+==================================================
+           📱 INFO PEMBAYARAN QRIS (DANA)
+==================================================
+Provider     : DANA
+Nomor DANA   : 08814952272
+Merchant     : KANTIN SMKS ANTARTIKA 1 SDA
+QR Code URL  : https://media.discordapp.net/...
+--------------------------------------------------
+Silakan scan QR code di atas menggunakan aplikasi DANA
+==================================================
+```
+
+**Mengubah konfigurasi QRIS:**
+1. Via menu: `Pengaturan Toko` → `Pengaturan QRIS / DANA` (password: `admin123`) — **tersimpan permanen ke `settings.json`**
+2. Langsung edit `settings.json` → `qrisConfig` object
+
+```json
+"qrisConfig": {
+  "provider": "DANA",
+  "phoneNumber": "08814952272",
+  "qrImageUrl": "https://media.discordapp.net/...",
+  "merchantName": "KANTIN SMKS ANTARTIKA 1 SDA"
+}
+```
+
+---
+
+## 🏦 Transfer Bank / Rekening
+
+Sistem mendukung multiple rekening transfer (bank & e-wallet). Default: **DANA** (08814952272).
+
+**Mengelola rekening transfer:**
+1. Via menu: `Pengaturan Toko` → `Pengaturan Transfer / Rekening`
+2. Langsung edit `settings.json` → `transferAccounts` array
+
+```json
+"transferAccounts": [
+  { "id": "dana", "name": "DANA", "type": "ewallet", "number": "08814952272", "enabled": true },
+  { "id": "bca", "name": "BCA", "type": "bank", "number": "1234567890", "enabled": true }
+]
+```
+
+**Saat pembayaran Transfer Bank dipilih**, program menampilkan:
+```
+==================================================
+        🏦 INFO PEMBAYARAN TRANSFER BANK
+==================================================
+  DANA (ewallet)
+  Nomor: 08814952272
+  --------------------------------------------------
+  BCA (bank)
+  Nomor: 1234567890
+  --------------------------------------------------
+Silakan transfer ke salah satu rekening di atas.
+Konfirmasi pembayaran ke kasir setelah transfer.
+==================================================
+```
 
 ---
 
@@ -312,8 +449,9 @@ Es Teh Manis             10 pcs = Rp50.000
 ```
 kelompok1/
 ├── kasir-kantin.ts      # File utama — seluruh logika program
-├── config.ts            # Konfigurasi data (menu, diskon, pajak, dll.)
+├── config.ts            # Konfigurasi default (menu, diskon, pajak, dll.)
 ├── config.js            # Konfigurasi dalam format JavaScript (CommonJS)
+├── settings.json        # Konfigurasi runtime (nama toko, QRIS, transfer, password) — AUTO GENERATED
 ├── _run_test.js         # Script untuk menjalankan test otomatis
 ├── _test_input.txt      # Input test untuk testing otomatis
 ├── package.json         # Konfigurasi project & dependencies
